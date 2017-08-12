@@ -199,7 +199,7 @@ class PluginTest1:
             self.log("Loading GAUL data...")
             gaul_layer = self.iface.addVectorLayer(GAUL_SHP, "GAUL", "ogr")
             if not gaul_layer.isValid():
-                raise RuntimeError("Error loading " + GAUL_SHP)
+                raise RuntimeError("Error loading " + GAUL_SHP + "or associated file")
             self.log("Loading SPAM data...")
             spam_layer = self.iface.addRasterLayer(SPAM_TIFF, 'SPAM')
             if not spam_layer.isValid():
@@ -217,3 +217,12 @@ class PluginTest1:
                             fao_ethiopia_2014 = row
             assert fao_ethiopia_2005
             assert fao_ethiopia_2014
+
+            # Analyse Ethiopia
+            self.log("Select Ethiopia")
+            selection_list = []
+            features = gaul_layer.getFeatures()
+            for feature in features:
+                if feature['ADM0_NAME'] == 'Ethiopia':
+                    selection_list.append(feature.id())
+            gaul_layer.setSelectedFeatures(selection_list)
