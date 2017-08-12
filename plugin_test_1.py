@@ -26,8 +26,14 @@ from PyQt4.QtGui import QAction, QIcon
 import resources
 # Import the code for the dialog
 from plugin_test_1_dialog import PluginTest1Dialog
-import os.path
+# Misc imports
+import csv
+import os
+from qgis.core import QgsMessageLog
 
+GAUL_SHP  = os.environ['IIASA_DROPBOX'] + "/GAUL/g2015_2005_2.shp"
+SPAM_TIFF = os.environ['IIASA_DROPBOX'] + "/SPAM/spam2005v2r0_harvested-area_wheat_total.tiff"
+FAO_CSV   = os.environ['IIASA_DROPBOX'] + "/FAOSTAT/FAOSTAT_data_8-1-2017.csv"
 
 class PluginTest1:
     """QGIS Plugin Implementation."""
@@ -80,7 +86,6 @@ class PluginTest1:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('PluginTest1', message)
-
 
     def add_action(
         self,
@@ -179,6 +184,8 @@ class PluginTest1:
         # remove the toolbar
         del self.toolbar
 
+    def log(self, message):
+        QgsMessageLog.logMessage(message, "Plugin Log")
 
     def run(self):
         """Run method that performs all the real work"""
@@ -188,6 +195,25 @@ class PluginTest1:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+            # Load data
+            self.log("Loading GAUL data...")
+            gaul_layer = self.iface.addVectorLayer(GAUL_SHP, "GAUL", "ogr")
+            if not gaul_layer.isValid():
+                raise RuntimeError("Error loading " + GAUL_SHP)
+            self.log("Loading SPAM data...")
+            spam_layer = self.iface.addRasterLayer(SPAM_TIFF, 'SPAM')
+            if not spam_layer.isValid():
+                raise RuntimeError("Error loading " + SPAM_TIFF)
+            self.log("Filtering FAO wheat harvested area data...")
+            fao_ethiopia_2005=None
+            fao_ethiopia_2014=None
+            with open(FAO_CSV) as csv_file:
+                csv_reader = csv.DictReader(csv_file)
+                for row in csv_reader:
+                    if row['Area'] == 'Ethiopia':
+                        if   row['Year'] == '2005':
+                            fao_ethiopia_2005 = row
+                        elif row['Year'] == '2014':
+                            fao_ethiopia_2014 = row
+            assert fao_ethiopia_2005
+            assert fao_ethiopia_2014
