@@ -1,6 +1,6 @@
 A QGIS plugin to process the dropbox data set.
 
-Useage:
+Usage:
 
 Install a recent QGIS:
 https://www.qgis.org/en/site/forusers/download.html.
