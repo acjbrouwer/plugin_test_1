@@ -217,6 +217,8 @@ class PluginTest1:
                             fao_ethiopia_2014 = row
             assert fao_ethiopia_2005
             assert fao_ethiopia_2014
+            self.log(str(fao_ethiopia_2005))
+            self.log(str(fao_ethiopia_2014))
 
             # Analyse Ethiopia
             self.log("Select Ethiopia")
