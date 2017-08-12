@@ -1,0 +1,1 @@
+QGIS plugin for task 1
